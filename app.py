@@ -5,250 +5,352 @@ import os
 import math
 import io
 
-# =========================
-# PAGE HEADER
-# =========================
 st.set_page_config(
     page_title="Sponsor Tool",
-    page_icon="🎬",   # or use image path like "assets/logo.png"
+    page_icon="🎬",
     layout="wide"
 )
-
+# =========================
+# THEME DETECTION
+# =========================
+theme = st.get_option("theme.base") or "dark"
+is_dark = str(theme).lower() == "dark"
 
 # =========================
-# THEME BASED TEXT FIXES (UNCHANGED)
+# PREMIUM UI (FINAL FIXED)
 # =========================
-theme = st.get_option("theme.base")
-
-if theme == "dark":
-    st.markdown("""
-    <style>
-    section[data-testid="stSidebar"] div[role="radiogroup"] > label {
-        color: #e5e7eb !important;
-    }
-
-    button[kind="secondary"] {
-        color: white !important;
-    }
-
-    [data-testid="stFileUploader"] small {
-        color: #9ca3af !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-else:
-    st.markdown("""
-    <style>
-    section[data-testid="stSidebar"] div[role="radiogroup"] > label {
-        color: white !important;
-    }
-
-    button[kind="secondary"] {
-        color: black !important;
-    }
-
-    [data-testid="stFileUploader"] small {
-        color: black !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-
-# =========================
-# CHANNEL BUTTON UI (FIXED)
-# =========================
-st.markdown("""
+st.markdown(f"""
 <style>
 
 /* =========================
-   SIDEBAR (PREMIUM DARK GLASS)
+   GLOBAL BACKGROUND FIX
 ========================= */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(
-        180deg,
-        #020617 0%,
-        #020617 25%,
-        #020b2a 60%,
-        #0b0f3a 100%
-    );
 
-    backdrop-filter: blur(20px);
+html,
+body,
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewContainer"] > .main {{
 
-    border-right: 1px solid rgba(99,102,241,0.15);
-
-    box-shadow:
-        4px 0 30px rgba(59,130,246,0.08),
-        inset -1px 0 0 rgba(255,255,255,0.05);
-}
-
+    background-color: {'#030712' if is_dark else '#f3f4f6'} !important;
+}}
 
 /* =========================
-   CHANNEL BUTTON BASE
+   MAIN CONTAINER
 ========================= */
-section[data-testid="stSidebar"] div[role="radiogroup"] > label {
 
-    display: flex;
-    align-items: center;
+.main .block-container {{
 
-    padding: 8px 10px;
-    margin-bottom: 8px;
+    padding-top: 1.5rem !important;
+
+    background-color: {'#030712' if is_dark else '#f3f4f6'} !important;
+
+    color: {'#f9fafb' if is_dark else '#111827'} !important;
+
+    min-height: 100vh;
+}}
+
+/* =========================
+   PREMIUM SIDEBAR
+========================= */
+
+section[data-testid="stSidebar"] > div:first-child {{
+
+    background:
+        {"linear-gradient(180deg, #020617 0%, #020617 20%, #020b2a 55%, #0b0f3a 100%)"
+        if is_dark
+        else "linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #eef2ff 100%)"};
+
+    border-right:
+        {"1px solid rgba(99,102,241,0.15)"
+        if is_dark
+        else "1px solid rgba(99,102,241,0.10)"};
+
+    box-shadow:
+        {"4px 0 25px rgba(59,130,246,0.08)"
+        if is_dark
+        else "4px 0 25px rgba(0,0,0,0.04)"};
+}}
+
+/* =========================
+   SIDEBAR LABELS
+========================= */
+
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] div {{
+    color: {"#e5e7eb" if is_dark else "#111827"} !important;
+}}
+
+/* =========================
+   CHANNEL BUTTONS
+========================= */
+
+section[data-testid="stSidebar"] div[role="radiogroup"] > label {{
+
+    background:
+        {"rgba(255,255,255,0.03)"
+        if is_dark
+        else "rgba(255,255,255,0.92)"};
+
+    padding: 6px 8px;
+    margin-bottom: 6px;
 
     border-radius: 10px;
     font-size: 13px;
 
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    border:
+        {"1px solid rgba(255,255,255,0.06)"
+        if is_dark
+        else "1px solid rgba(0,0,0,0.06)"};
 
-    transition: all 0.25s ease;
-}
+    transition: all 0.2s ease;
+
+    cursor: pointer !important;
+}}
 
 /* Hover */
-section[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-    background: rgba(59,130,246,0.18);
-    transform: translateX(3px);
-}
 
+section[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {{
 
-/* =========================
-   SELECTED BUTTON
-========================= */
-section[data-testid="stSidebar"] div[role="radiogroup"] > label[aria-checked="true"] {
+    background:
+        {"rgba(59,130,246,0.15)"
+        if is_dark
+        else "rgba(59,130,246,0.10)"};
+
+    transform: translateX(2px);
+}}
+
+/* Selected */
+
+section[data-testid="stSidebar"] div[role="radiogroup"] > label[data-baseweb="radio"][aria-checked="true"] {{
     background: linear-gradient(90deg, #2563eb, #7c3aed) !important;
     color: white !important;
-    border: none;
-
-    box-shadow: 
-        0 0 14px rgba(99,102,241,0.7),
-        inset 0 0 8px rgba(255,255,255,0.15);
-}
-
+    box-shadow: 0 0 12px rgba(99,102,241,0.45);
+}}
 
 /* =========================
-   RADIO DOT
-========================= */
-section[data-testid="stSidebar"] input[type="radio"] {
-    accent-color: #ef4444;
-}
-
-
-/* =========================
-   HERO SECTION (NEW PREMIUM GRADIENT)
+   FILE UPLOADER
 ========================= */
 
-/* Container spacing fix */
-.block-container {
-    padding-top: 2rem;
-}
+[data-testid="stFileUploader"] {{
 
-/* Hero Wrapper */
-.hero-container {
-    border-radius: 18px;
-    padding: 18px;
-    position: relative;
-    overflow: hidden;
+    background:
+        {"rgba(255,255,255,0.04)"
+        if is_dark
+        else "rgba(255,255,255,0.92)"} !important;
 
-    background: linear-gradient(
-        135deg,
-        #fbbf24 0%,
-        #f59e0b 25%,
-        #f97316 55%,
-        #ea580c 80%,
-        #dc2626 100%
-    );
-
-    box-shadow: 
-        0 15px 40px rgba(0,0,0,0.35),
-        inset 0 0 40px rgba(255,255,255,0.06);
-}
-
-
-/* Gloss light effect */
-.hero-container::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 18px;
-
-    background: linear-gradient(
-        120deg,
-        rgba(255,255,255,0.18) 0%,
-        rgba(255,255,255,0.05) 30%,
-        transparent 60%
-    );
-
-    pointer-events: none;
-}
-
-
-/* Image inside hero */
-.hero-container img {
     border-radius: 12px;
-}
+    padding: 12px;
 
+    border:
+        {"1px solid rgba(255,255,255,0.06)"
+        if is_dark
+        else "1px solid rgba(0,0,0,0.06)"} !important;
+}}
+
+/* Remove white inner upload area */
+
+[data-testid="stFileUploaderDropzone"] {{
+
+    background:
+        {"rgba(255,255,255,0.02)"
+        if is_dark
+        else "#ffffff"} !important;
+
+    border:
+        {"1px dashed rgba(255,255,255,0.08)"
+        if is_dark
+        else "1px dashed rgba(0,0,0,0.10)"} !important;
+
+    border-radius: 10px !important;
+}}
+
+/* Remove extra white section */
+
+[data-testid="stFileUploader"] section {{
+    background: transparent !important;
+}}
+
+/* Upload Button */
+
+[data-testid="stFileUploader"] button {{
+
+    background:
+        {"#374151"
+        if is_dark
+        else "#e5e7eb"} !important;
+
+    color:
+        {"white"
+        if is_dark
+        else "#111827"} !important;
+
+    border: none !important;
+    border-radius: 8px !important;
+}}
+
+/* Upload text */
+
+[data-testid="stFileUploader"] small {{
+    color:
+        {"#9ca3af"
+        if is_dark
+        else "#374151"} !important;
+
+    opacity: 1 !important;
+}}
+
+/* Filename text */
+
+[data-testid="stFileUploader"] span {{
+    color:
+        {"#f9fafb"
+        if is_dark
+        else "#111827"} !important;
+}}
 
 /* =========================
-   FILE UPLOADER BUTTON (CLEAR GREY)
+   SELECTBOX
 ========================= */
-[data-testid="stFileUploader"] button {
-    background-color: #374151 !important;
-    color: white !important;
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-}
 
-[data-testid="stFileUploader"] button:hover {
-    background-color: #4b5563 !important;
-}
+div[data-baseweb="select"] {{
+    cursor: pointer !important;
+}}
 
+div[data-baseweb="select"] * {{
+    cursor: pointer !important;
+}}
+
+div[data-baseweb="select"] > div {{
+
+    background:
+        {"rgba(255,255,255,0.04)"
+        if is_dark
+        else "#ffffff"} !important;
+
+    color:
+        {"#f9fafb"
+        if is_dark
+        else "#111827"} !important;
+
+    border-radius: 10px !important;
+
+    border:
+        {"1px solid rgba(255,255,255,0.08)"
+        if is_dark
+        else "1px solid rgba(0,0,0,0.08)"} !important;
+}}
+
+/* Selected text */
+
+div[data-baseweb="select"] span {{
+    color:
+        {"#f9fafb"
+        if is_dark
+        else "#111827"} !important;
+}}
+
+/* Dropdown arrow */
+
+div[data-baseweb="select"] svg {{
+    fill:
+        {"#f9fafb"
+        if is_dark
+        else "#111827"} !important;
+}}
+
+/* Dropdown menu */
+
+ul[role="listbox"] {{
+
+    background:
+        {"#020617"
+        if is_dark
+        else "#ffffff"} !important;
+
+    border:
+        {"1px solid rgba(255,255,255,0.10)"
+        if is_dark
+        else "1px solid rgba(0,0,0,0.08)"} !important;
+}}
+
+/* Dropdown options */
+
+ul[role="listbox"] li {{
+    color:
+        {"#f9fafb"
+        if is_dark
+        else "#111827"} !important;
+}}
 
 /* =========================
-   REMOVE TEXT CURSOR (CLEAN UI)
+   DOWNLOAD BUTTON
 ========================= */
-body, div, section {
-    caret-color: transparent !important;
-}
 
-input, textarea {
-    caret-color: auto !important;
-}
-            
-/* DOWNLOAD BUTTON */
-div.stDownloadButton > button {
+.stDownloadButton button {{
     background: linear-gradient(90deg, #2563eb, #7c3aed) !important;
     color: white !important;
     border: none !important;
     border-radius: 10px !important;
-    padding: 10px 18px !important;
-    font-weight: 500;
-    box-shadow: 0 0 10px rgba(99,102,241,0.5);
-}
+    padding: 0.6rem 1.3rem !important;
+    font-weight: 600 !important;
+}}
 
-/* Hover */
-div.stDownloadButton > button:hover {
+.stDownloadButton button:hover {{
     transform: translateY(-1px);
-    box-shadow: 0 0 16px rgba(99,102,241,0.8);
-}
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+}}
 
-/* Hide top right toolbar (Deploy + menu) */
-header[data-testid="stHeader"] {
-    display: none;
-}
+/* =========================
+   MAIN TEXT
+========================= */
 
-/* Remove top spacing created by header */
-.block-container {
-    padding-top: 1rem !important;
-}
-            
-/* Category dropdown → show hand cursor */
-div[data-baseweb="select"] * {
-    cursor: pointer !important;
-}
+h1, h2, h3, h4, h5, h6, p {{
+    color: {"#f9fafb" if is_dark else "#111827"} !important;
+}}
 
-/* Dropdown options list → hand cursor */
-ul[role="listbox"] li {
-    cursor: pointer !important;
-}
+/* =========================
+   REMOVE CURSOR
+========================= */
+
+* {{
+    caret-color: transparent !important;
+}}
+
+/* =========================
+   HIDE STREAMLIT MENU
+========================= */
+
+#MainMenu {{
+    visibility: hidden;
+}}
+
+footer {{
+    visibility: hidden;
+}}
+
+header {{
+    background: transparent !important;
+}}
+
+/* Remove Deploy Button */
+
+.stDeployButton {{
+    display: none !important;
+}}
+/* =========================
+   REMOVE DEPLOY BUTTON
+========================= */
+
+[data-testid="stToolbar"] {{
+    display: none !important;
+}}
+
+.stDeployButton {{
+    display: none !important;
+}}
 
 </style>
 """, unsafe_allow_html=True)
@@ -268,10 +370,8 @@ CHANNEL_MAP = {
 DEFAULT_PATCH = {"x": 385, "y": 195, "width": 1150, "height": 715}
 UTSAV_PATCH = {"x": 550, "y": 312, "width": 820, "height": 550}
 
-
 def get_patch(channel):
     return UTSAV_PATCH if channel == "Star Utsav Movies" else DEFAULT_PATCH
-
 
 # =========================
 # SIDEBAR
@@ -286,38 +386,29 @@ category = st.sidebar.selectbox("Category", [
 
 custom_text = st.sidebar.text_input("Custom Text") if category=="Others" else ""
 
-
 # =========================
 # FUNCTIONS
 # =========================
 def get_scale(category):
     return 0.20 if category in ["Presented by","Co-Presented by"] else 0.15
 
-
 def get_bbox(img):
     if img.mode!="RGBA":
         img=img.convert("RGBA")
-
     arr=np.array(img)
     alpha=arr[:,:,3]
     coords=np.where(alpha>0)
-
-    if len(coords[0])==0:
-        return None
-
+    if len(coords[0])==0: return None
     return coords[1].min(),coords[0].min(),coords[1].max(),coords[0].max()
-
 
 def crop(img):
     bbox=get_bbox(img)
     return img.crop(bbox) if bbox else img
 
-
 def scale_logo(logo,patch,scale):
     w,h=logo.size
     factor=math.sqrt((patch["width"]*patch["height"])/(w*h))*scale
     return logo.resize((int(w*factor),int(h*factor)),Image.LANCZOS)
-
 
 def paste(bg,logo,patch):
     x=patch["x"]+(patch["width"]-logo.width)//2
@@ -325,13 +416,17 @@ def paste(bg,logo,patch):
     bg.paste(logo,(x,y),logo if logo.mode=="RGBA" else None)
     return y
 
-
+# =========================
+# TEXT
+# =========================
 def draw_text(bg,text,logo_top,patch,logo_width):
     draw=ImageDraw.Draw(bg)
+
     font_size=int(logo_width*0.12)
     font=ImageFont.truetype("assets/fonts/Magenos-Regular.otf",font_size)
 
     text=text.upper()
+
     bbox=draw.textbbox((0,0),text,font=font)
     text_w=bbox[2]
 
@@ -340,53 +435,56 @@ def draw_text(bg,text,logo_top,patch,logo_width):
 
     draw.text((x,y),text,fill="black",font=font)
 
-
+# =========================
+# WARNING
+# ========================= 
 def draw_warning(bg, text):
     draw = ImageDraw.Draw(bg)
+
+    # Font (slightly bigger for clarity)
     font = ImageFont.truetype("assets/fonts/Magenos-Regular.otf", 34)
 
     text = text.upper()
 
-    # TEXT SIZE
+    # Measure text
     bbox = draw.textbbox((0, 0), text, font=font)
     text_w = bbox[2]
     text_h = bbox[3]
 
-    # ICON CONFIG
+    # Layout settings
     icon_size = 26
-    gap = 12
+    gap = 14
+    padding_x = 28
+    padding_y = 14
 
     total_w = icon_size + gap + text_w
 
-    # CENTER WHOLE BLOCK (ICON + TEXT)
+    # PERFECT CENTER ALIGNMENT
     x = (bg.width - total_w) // 2
-    y = bg.height - (text_h + 60)
+    y = bg.height - (text_h + padding_y * 2 + 40)
 
-    # =========================
-    # BACKGROUND STRIP
-    # =========================
-    padding_x = 24
-    padding_y = 10
-
+    # -------------------------
+    # BACKGROUND STRIP (clean centered)
+    # -------------------------
     overlay = Image.new("RGBA", bg.size, (0, 0, 0, 0))
     overlay_draw = ImageDraw.Draw(overlay)
 
+    rect_x1 = x - padding_x
+    rect_y1 = y - padding_y
+    rect_x2 = x + total_w + padding_x
+    rect_y2 = y + text_h + padding_y
+
     overlay_draw.rounded_rectangle(
-        [
-            x - padding_x,
-            y - padding_y,
-            x + total_w + padding_x,
-            y + text_h + padding_y
-        ],
-        radius=10,
-        fill=(0, 0, 0, 210)
+        [rect_x1, rect_y1, rect_x2, rect_y2],
+        radius=6,
+        fill=(0, 0, 0, 200)
     )
 
     bg.paste(overlay, (0, 0), overlay)
 
-    # =========================
-    # ICON (perfect alignment)
-    # =========================
+    # -------------------------
+    # WARNING ICON (centered vertically)
+    # -------------------------
     icon_x = x
     icon_y = y + (text_h - icon_size) // 2
 
@@ -398,42 +496,46 @@ def draw_warning(bg, text):
 
     draw.polygon(triangle, fill="#FFD60A")
 
-    # exclamation
+    # Exclamation mark
     ex_x = icon_x + icon_size // 2
-    draw.line([(ex_x, icon_y + 6), (ex_x, icon_y + 16)], fill="black", width=2)
-    draw.ellipse((ex_x - 2, icon_y + 18, ex_x + 2, icon_y + 22), fill="black")
+    draw.line(
+        [(ex_x, icon_y + 6), (ex_x, icon_y + 16)],
+        fill="black",
+        width=2
+    )
+    draw.ellipse(
+        (ex_x - 1, icon_y + 19, ex_x + 1, icon_y + 21),
+        fill="black"
+    )
 
-    # =========================
-    # TEXT (aligned to icon)
-    # =========================
-    draw.text((icon_x + icon_size + gap, y), text, fill="#FFD60A", font=font)
-
+    # -------------------------
+    # TEXT (aligned properly)
+    # -------------------------
+    text_x = icon_x + icon_size + gap
+    draw.text((text_x, y), text, fill="#FFD60A", font=font)
 
 # =========================
 # MAIN
 # =========================
-# =========================
-# HERO / PREVIEW SECTION
-# =========================
 
-st.markdown("## ")
-
-# Load default slate preview
-preview_bg = Image.open(
+# Always show selected slate
+bg = Image.open(
     os.path.join("assets/slates", CHANNEL_MAP[channel])
 ).convert("RGB")
 
-# Show preview if no logo uploaded
+# Remove blinking cursor space
+st.markdown("""
+<style>
+textarea, input {
+    caret-color: transparent !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Show plain slate before upload
 if not logo_file:
-    st.markdown(
-        "<h3 style='text-align:center; color:#9ca3af;'>Upload a logo to generate sponsor slate</h3>",
-        unsafe_allow_html=True
-    )
-
-    st.image(preview_bg)
-
-if logo_file:
-    bg = Image.open(os.path.join("assets/slates", CHANNEL_MAP[channel])).convert("RGB")
+    st.image(bg)
+else:
     logo = Image.open(logo_file)
 
     is_low_res = max(logo.size) < 800
@@ -441,14 +543,26 @@ if logo_file:
     cropped = crop(logo)
     patch = get_patch(channel)
 
-    resized = scale_logo(cropped, patch, get_scale(category))
+    # =========================
+    # FIX FOR THUMBS UP LOGO
+    # =========================
+    logo_name = logo_file.name.lower()
+
+    scale = get_scale(category)
+
+    if "thumb" in logo_name or "thums" in logo_name:
+        scale += 0.06
+
+    resized = scale_logo(cropped, patch, scale)
+
     y = paste(bg, resized, patch)
 
     text = custom_text if category == "Others" else category
+
     draw_text(bg, text, y, patch, resized.width)
 
     if is_low_res:
-        draw_warning(bg, "LOW RESOLUTION LOGO — MAY APPEAR BLURRY")
+        draw_warning(bg, "Logo resolution below broadcast standard")
 
     st.subheader("Final Output")
     st.image(bg)
@@ -460,4 +574,9 @@ if logo_file:
     bg.save(buf, "JPEG", quality=95, subsampling=0)
     buf.seek(0)
 
-    st.download_button("Download Output", buf, file_name=filename)
+    st.download_button(
+        "Download Output",
+        buf,
+        file_name=filename,
+        key=f"download_{channel}_{name}"
+    )
